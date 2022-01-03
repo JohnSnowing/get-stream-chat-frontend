@@ -1,16 +1,61 @@
 import React, { useState } from "react";
 import Cookies from "universal-cookie";
+import axios from "axios";
 
 import signinImage from "../assets/signup.jpg";
 
+const cookies = new Cookies();
+
+const initialState = {
+    fullName: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: "",
+    avatarURL: "",
+};
+
 const Auth = () => {
-    const [form, setForm] = useState();
+    const [form, setForm] = useState(initialState);
     const [isSignUp, setIsSignUp] = useState(true);
 
-    const handleChange = () => {};
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
 
     const switchMode = () => {
         setIsSignUp((prevIsSignUp) => !prevIsSignUp);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const { fullName, username, password, phoneNumber, avatarURL } = form;
+
+        const URL = "http://localhost:5000/auth";
+
+        const {
+            data: { token, userId, hashedPassword },
+        } = await axios.post(`${URL}/${isSignUp ? "signup" : "login"}`, {
+            username,
+            password,
+            fullName,
+            phoneNumber,
+            avatarURL,
+        });
+
+        cookies.set("token", token);
+        cookies.set("username", username);
+        cookies.set("fullName", fullName);
+        cookies.set("userId", userId);
+
+        if (isSignUp) {
+            cookies.set("phoneNumber", phoneNumber);
+            cookies.set("avatarURL", avatarURL);
+            cookies.set("hashedPassword", hashedPassword);
+        }
+
+        window.location.reload();
     };
 
     return (
@@ -18,7 +63,7 @@ const Auth = () => {
             <div className="auth__form-container_fields">
                 <div className="auth__form-container_fields-content">
                     <p>{isSignUp ? "Sign Up" : "Sign In"}</p>
-                    <form onSubmit={() => {}}>
+                    <form onSubmit={handleSubmit}>
                         {isSignUp && (
                             <div className="auth__form-container_fields-content_input">
                                 <label htmlFor="fullName">Full Name</label>
@@ -60,11 +105,11 @@ const Auth = () => {
                         )}
                         {isSignUp && (
                             <div className="auth__form-container_fields-content_input">
-                                <label htmlFor="avaterURL">Avatar URL</label>
+                                <label htmlFor="avatarURL">Avatar URL</label>
                                 <input
                                     type="text"
-                                    name="avaterURL"
-                                    id="avaterURL"
+                                    name="avatarURL"
+                                    id="avatarURL"
                                     placeholder="Avater URL"
                                     onChange={handleChange}
                                     required
@@ -97,6 +142,9 @@ const Auth = () => {
                                 />
                             </div>
                         )}
+                        <div className="auth__form-container_fields-content_button">
+                            <button>{isSignUp ? "Sign Up" : "Sign In"}</button>
+                        </div>
                     </form>
                     <div className="auth__form-container_fields-account">
                         <p>
