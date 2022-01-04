@@ -33,7 +33,12 @@ const CompanyHeader = () => {
     );
 };
 
-const ChannelListContainer = () => {
+const ChannelListContainer = ({
+    isCreating,
+    setIsCreating,
+    setCreateType,
+    setIsEditing,
+}) => {
     const logout = () => {
         cookies.remove("token");
         cookies.remove("userId");
@@ -56,7 +61,16 @@ const ChannelListContainer = () => {
                     filters={{}}
                     channelRenderFilterFn={() => {}}
                     List={(listProps) => {
-                        return <TeamChannelList {...listProps} type="team" />;
+                        return (
+                            <TeamChannelList
+                                {...listProps}
+                                type="team"
+                                isCreating={isCreating}
+                                setIsCreating={setIsCreating}
+                                setCreateType={setCreateType}
+                                setIsEditing={setIsEditing}
+                            />
+                        );
                     }}
                     Preview={(previewProps) => {
                         return (
@@ -69,7 +83,14 @@ const ChannelListContainer = () => {
                     channelRenderFilterFn={() => {}}
                     List={(listProps) => {
                         return (
-                            <TeamChannelList {...listProps} type="messaging" />
+                            <TeamChannelList
+                                {...listProps}
+                                type="messaging"
+                                isCreating={isCreating}
+                                setIsCreating={setIsCreating}
+                                setCreateType={setCreateType}
+                                setIsEditing={setIsEditing}
+                            />
                         );
                     }}
                     Preview={(previewProps) => {
